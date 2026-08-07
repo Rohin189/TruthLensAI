@@ -1,0 +1,35 @@
+# Core
+python-dotenv==1.0.1
+pydantic==2.9.2
+
+# Document processing
+pypdf==4.3.1
+python-docx==1.1.2
+# unstructured intentionally omitted for now (heavy deps, OCR stack) -
+# add back later in a dedicated OCR phase if needed:
+# unstructured==0.16.25
+
+# Embeddings & retrieval
+sentence-transformers==3.1.1
+chromadb
+faiss-cpu==1.9.0.post1
+
+# LLM inference (local, quantized) - swap for provider SDK if using hosted API
+transformers==4.45.2
+accelerate==0.34.2
+# torch installed SEPARATELY below via PyTorch's own index - do not pip install from this file
+
+# Backend / frontend
+fastapi==0.115.0
+uvicorn==0.31.0
+streamlit==1.39.0
+
+# Evaluation - deferred to Phase 12, installed separately then to avoid
+# dependency backtracking conflicts with modern langchain already in this env
+# ragas==0.4.3
+# deepeval==1.4.9
+
+# Utilities
+tqdm==4.66.5
+numpy>=1.26,<3.0
+pandas==2.2.3

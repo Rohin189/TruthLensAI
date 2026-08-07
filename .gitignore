@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Env / secrets
+.env
+*.key
+
+# Data (raw papers, big files — track via README/DVC later, not git)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Vector DB artifacts
+chroma_db/
+*.faiss
+*.index
+
+# Model weights / checkpoints
+*.bin
+*.safetensors
+*.gguf
+lora_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# OS/IDE
+.DS_Store
+.vscode/
+.idea/

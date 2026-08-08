@@ -31,3 +31,4 @@ notebooks/.ipynb_checkpoints/
 .DS_Store
 .vscode/
 .idea/
+requirements-lock.txt

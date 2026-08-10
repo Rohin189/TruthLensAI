@@ -1,47 +1,90 @@
-"""
-Document-level metadata extraction for TruthLens AI.
+"""arXiv paper search, download, and manifest tracking."""
+import arxiv
+import json
+import time
+from pathlib import Path
+from datetime import datetime
 
-Best-effort extraction of paper metadata (title, arXiv ID, year) from the
-first page of a research-paper PDF. This is heuristic, not a full parser —
-good enough to populate citation/source display in the frontend without
-needing a dedicated metadata-extraction model.
-"""
-import re
-from dataclasses import dataclass
+RAW_DIR = Path("data/raw")
+MANIFEST_PATH = RAW_DIR / "manifest.json"
 
-ARXIV_ID_PATTERN = re.compile(r"arXiv:(\d{4}\.\d{4,5})(v\d+)?", re.IGNORECASE)
-YEAR_PATTERN = re.compile(r"\b(19|20)\d{2}\b")
+DEFAULT_CATEGORIES = ["cs.CL", "cs.LG", "cs.AI"]
 
-
-@dataclass
-class DocumentMetadata:
-    source_file: str
-    title: str | None = None
-    arxiv_id: str | None = None
-    year: str | None = None
+DEFAULT_QUERIES = [
+    "retrieval augmented generation",
+    "large language model hallucination",
+    "parameter efficient fine-tuning LoRA",
+    "hallucination detection NLP",
+    "self-correction language models",
+]
 
 
-def extract_title(first_page_text: str) -> str | None:
-    """Heuristic: the title is usually the first non-empty line that isn't
-    an arXiv footer, and is reasonably short (not a full sentence/paragraph).
-    """
-    lines = [l.strip() for l in first_page_text.splitlines() if l.strip()]
-    for line in lines:
-        if ARXIV_ID_PATTERN.search(line):
+def load_manifest() -> dict:
+    if MANIFEST_PATH.exists():
+        return json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    return {}
+
+
+def save_manifest(manifest: dict):
+    MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
+    MANIFEST_PATH.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+
+def download_papers(
+    query: str,
+    max_results: int = 30,
+    categories: list[str] | None = None,
+    sort_by=arxiv.SortCriterion.Relevance,
+) -> dict:
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    manifest = load_manifest()
+
+    categories = categories or DEFAULT_CATEGORIES
+    cat_filter = " OR ".join(f"cat:{c}" for c in categories)
+    full_query = f"({query}) AND ({cat_filter})"
+
+    client = arxiv.Client(page_size=50, delay_seconds=3, num_retries=3)
+    search = arxiv.Search(query=full_query, max_results=max_results, sort_by=sort_by)
+
+    downloaded = 0
+    for result in client.results(search):
+        arxiv_id = result.get_short_id()
+        if arxiv_id in manifest:
             continue
-        word_count = len(line.split())
-        if 2 <= word_count <= 25:
-            return line
-    return None
+
+        filename = f"{arxiv_id.replace('/', '_')}.pdf"
+        try:
+            result.download_pdf(dirpath=str(RAW_DIR), filename=filename)
+        except Exception as e:
+            print(f"  x Failed to download {arxiv_id}: {e}")
+            continue
+
+        manifest[arxiv_id] = {
+            "title": result.title,
+            "authors": [a.name for a in result.authors],
+            "published": result.published.isoformat(),
+            "categories": result.categories,
+            "summary": result.summary,
+            "pdf_url": result.pdf_url,
+            "filename": filename,
+            "downloaded_at": datetime.utcnow().isoformat(),
+        }
+        downloaded += 1
+        print(f"  [{downloaded}] {result.title[:70]}")
+        time.sleep(1)
+
+    save_manifest(manifest)
+    print(f"\nDownloaded {downloaded} new papers. Total in manifest: {len(manifest)}")
+    return manifest
 
 
-def extract_metadata(first_page_text: str, source_file: str) -> DocumentMetadata:
-    arxiv_match = ARXIV_ID_PATTERN.search(first_page_text)
-    year_match = YEAR_PATTERN.search(first_page_text)
-
-    return DocumentMetadata(
-        source_file=source_file,
-        title=extract_title(first_page_text),
-        arxiv_id=arxiv_match.group(1) if arxiv_match else None,
-        year=year_match.group(0) if year_match else None,
-    )
+def run_all_queries(queries: list[str] | None = None, max_results_per_query: int = 30) -> dict:
+    queries = queries or DEFAULT_QUERIES
+    for q in queries:
+        print(f"\n--- Query: {q} ---")
+        try:
+            download_papers(query=q, max_results=max_results_per_query)
+        except Exception as e:
+            print(f"  !! Query failed, skipping: {q} ({e})")
+            continue
+    return load_manifest()

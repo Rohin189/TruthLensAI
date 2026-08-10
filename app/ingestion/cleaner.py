@@ -1,39 +1,28 @@
-"""
-Text cleaning for TruthLens AI ingestion pipeline.
-
-Research-paper PDFs are messy: hyphenated line breaks, repeated headers/
-footers, page numbers, ligature artifacts, and inconsistent whitespace.
-These functions normalize that before chunking.
-"""
+"""Clean raw extracted PDF text for chunking/embedding."""
 import re
 
 
-def dehyphenate(text: str) -> str:
-    """Rejoin words split across a line break with a trailing hyphen.
-    e.g. "hallucina-\ntion" -> "hallucination"
-    """
-    return re.sub(r"(\w)-\n(\w)", r"\1\2", text)
-
-
-def collapse_whitespace(text: str) -> str:
-    """Collapse runs of whitespace, but preserve paragraph breaks."""
-    text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text.strip()
-
-
-def strip_common_artifacts(text: str) -> str:
-    """Remove standalone page numbers and common arXiv footer patterns."""
-    # Standalone numeric lines (likely page numbers)
-    text = re.sub(r"^\s*\d{1,4}\s*$", "", text, flags=re.MULTILINE)
-    # arXiv preprint footer, e.g. "arXiv:2401.12345v2 [cs.CL] 3 Jan 2024"
-    text = re.sub(r"arXiv:\d{4}\.\d{4,5}(v\d+)?\s*\[[\w.]+\]\s*\d{1,2}\s+\w+\s+\d{4}", "", text)
-    return text
-
-
 def clean_text(text: str) -> str:
-    """Apply the full cleaning pipeline in order."""
-    text = dehyphenate(text)
-    text = strip_common_artifacts(text)
-    text = collapse_whitespace(text)
+    text = re.sub(r"arXiv:\d{4}\.\d{4,5}v?\d*\s*\[.*?\]\s*\d{1,2}\s\w+\s\d{4}", "", text)
+    text = re.sub(r"\n\s*\d+\s*\n", "\n", text)
+    text = re.sub(r"(\w)-\n(\w)", r"\1\2", text)
+    text = re.sub(r"\n{2,}", "\n\n", text)
+    text = re.sub(r"[ \t]{2,}", " ", text)
+
+    lines = text.split("\n")
+    cleaned_lines = [
+        ln for ln in lines
+        if len(ln.strip()) == 0 or sum(c.isalnum() for c in ln) / max(len(ln), 1) > 0.3
+    ]
+    return "\n".join(cleaned_lines).strip()
+
+def truncate_references_section(text: str) -> str:
+    match = re.search(r"\n\s*(references|bibliography)\s*\n", text, re.IGNORECASE)
+    if match:
+        return text[: match.start()]
     return text
+
+
+def sanitize_text(text: str) -> str:
+    """Remove invalid unicode surrogate characters that break UTF-8 encoding."""
+    return text.encode("utf-8", errors="ignore").decode("utf-8")

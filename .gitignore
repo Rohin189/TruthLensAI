@@ -33,3 +33,5 @@ notebooks/.ipynb_checkpoints/
 .idea/
 requirements-lock.txt
 data/chunks/*.jsonl
+
+data/embeddings/

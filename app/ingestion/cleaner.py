@@ -1,8 +1,26 @@
 """Clean raw extracted PDF text for chunking/embedding."""
 import re
 
+LIGATURE_MAP = {
+    "\ufb00": "ff",
+    "\ufb01": "fi",
+    "\ufb02": "fl",
+    "\ufb03": "ffi",
+    "\ufb04": "ffl",
+    "\ufb05": "ft",
+    "\ufb06": "st",
+}
+
+
+def fix_ligatures(text: str) -> str:
+    for lig, replacement in LIGATURE_MAP.items():
+        text = text.replace(lig, replacement)
+    return text
+
+
 
 def clean_text(text: str) -> str:
+    text = fix_ligatures(text)
     text = re.sub(r"arXiv:\d{4}\.\d{4,5}v?\d*\s*\[.*?\]\s*\d{1,2}\s\w+\s\d{4}", "", text)
     text = re.sub(r"\n\s*\d+\s*\n", "\n", text)
     text = re.sub(r"(\w)-\n(\w)", r"\1\2", text)

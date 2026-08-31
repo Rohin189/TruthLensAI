@@ -1,0 +1,14 @@
+[
+  {"id": "q1", "question": "What causes hallucinations in large language models?"},
+  {"id": "q2", "question": "How does LoRA reduce the number of trainable parameters?"},
+  {"id": "q3", "question": "What is retrieval augmented generation?"},
+  {"id": "q4", "question": "What is QLoRA and how does it differ from LoRA?"},
+  {"id": "q5", "question": "How can hallucinations be detected in LLM outputs?"},
+  {"id": "q6", "question": "What are common chunking strategies for RAG systems?"},
+  {"id": "q7", "question": "What is the difference between intrinsic and extrinsic hallucinations?"},
+  {"id": "q8", "question": "How does self-correction improve LLM response quality?"},
+  {"id": "q9", "question": "What evaluation metrics are used for RAG systems?"},
+  {"id": "q10", "question": "What are the main challenges of deploying RAG in industry?"},
+  {"id": "q11", "question": "What is quantum entanglement?"},
+  {"id": "q12", "question": "How many trainable parameters does GPT-5 have?"}
+]

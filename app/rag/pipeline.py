@@ -50,3 +50,12 @@ def answer_question(query: str, top_k: int = 5, similarity_threshold: float = 0.
             for c in chunks
         ],
     }
+    
+NO_RAG_INSTRUCTION = "Answer the following question based on your own knowledge."
+
+
+def answer_question_no_rag(query: str) -> dict:
+    """Baseline ①: raw LLM, no retrieval, no grounding."""
+    prompt = f"{NO_RAG_INSTRUCTION}\n\nQUESTION: {query}\n\nANSWER:"
+    answer = generate(prompt)
+    return {"answer": answer, "sources": []}

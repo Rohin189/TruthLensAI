@@ -37,3 +37,4 @@ data/chunks/*.jsonl
 data/embeddings/
 
 data/chroma_db/
+run.txt

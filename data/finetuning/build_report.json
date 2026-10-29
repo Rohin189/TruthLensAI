@@ -1,0 +1,103 @@
+{
+  "input_pairs": 423,
+  "dropped_duplicate": 2,
+  "dropped_bad_output": 5,
+  "deictic": 157,
+  "rewritten": 141,
+  "rewritten_on_retry": 65,
+  "dropped_rewrite_failed": 16,
+  "dropped_eval_overlap": 3,
+  "eval_overlap_removed": [
+    {
+      "train": "How does the Utilizing Metadata for Better Retrieval-Augmented Generation paper demonstrate the effectiveness of prefixing and unified embeddings?",
+      "eval": "What is retrieval augmented generation?",
+      "sim": 0.851
+    },
+    {
+      "train": "What key improvements does integrating metadata into the embedding space provide for retrieval-augmented generation?",
+      "eval": "What is retrieval augmented generation?",
+      "sim": 0.859
+    },
+    {
+      "train": "What are the main challenges addressed by the introduction of advanced chunking strategies in RAG systems?",
+      "eval": "What are common chunking strategies for RAG systems?",
+      "sim": 0.932
+    }
+  ],
+  "eval_top_similarities": [
+    {
+      "train": "What are the main challenges addressed by the introduction of advanced chunking strategies in RAG systems?",
+      "eval": "What are common chunking strategies for RAG systems?",
+      "sim": 0.932
+    },
+    {
+      "train": "What key improvements does integrating metadata into the embedding space provide for retrieval-augmented generation?",
+      "eval": "What is retrieval augmented generation?",
+      "sim": 0.859
+    },
+    {
+      "train": "How does the Utilizing Metadata for Better Retrieval-Augmented Generation paper demonstrate the effectiveness of prefixing and unified embeddings?",
+      "eval": "What is retrieval augmented generation?",
+      "sim": 0.851
+    },
+    {
+      "train": "What is the primary goal of the RAG architecture in terms of enhancing retrieval-augmented generation systems?",
+      "eval": "What is retrieval augmented generation?",
+      "sim": 0.846
+    },
+    {
+      "train": "What limitation do traditional RAG systems face when handling diverse data sources?",
+      "eval": "What are common chunking strategies for RAG systems?",
+      "sim": 0.844
+    },
+    {
+      "train": "What are the three key challenges faced by current RAG systems according to the CARROT paper?",
+      "eval": "What are the main challenges of deploying RAG in industry?",
+      "sim": 0.839
+    },
+    {
+      "train": "What is the primary focus of the Utilizing Metadata for Better Retrieval-Augmented Generation study in the context of Retrieval-Augmented Generation (RAG) systems?",
+      "eval": "What is retrieval augmented generation?",
+      "sim": 0.836
+    },
+    {
+      "train": "How do previous studies address the issue of self-correction in large LMs?",
+      "eval": "How does self-correction improve LLM response quality?",
+      "sim": 0.835
+    },
+    {
+      "train": "How does CARROT address the non-monotonicity of chunk utility in RAG systems?",
+      "eval": "What are common chunking strategies for RAG systems?",
+      "sim": 0.834
+    },
+    {
+      "train": "How does Ragas address the challenges in evaluating RAG architectures?",
+      "eval": "What evaluation metrics are used for RAG systems?",
+      "sim": 0.833
+    }
+  ],
+  "dropped_no_gold": 83,
+  "gold_recall_mean": 0.649,
+  "gold_recall_histogram": {
+    "0.0-0.1": 3,
+    "0.1-0.2": 5,
+    "0.2-0.3": 18,
+    "0.3-0.4": 22,
+    "0.4-0.5": 35,
+    "0.5-0.6": 88,
+    "0.6-0.7": 43,
+    "0.7-0.8": 63,
+    "0.8-0.9": 63,
+    "0.9-1.0": 51
+  },
+  "refusal_attempts": 397,
+  "refusals_built": 47,
+  "dropped_too_long": 2,
+  "tokens_mean": 1199,
+  "tokens_max": 1730,
+  "answerable_examples": 313,
+  "refusal_examples": 46,
+  "train_examples": 321,
+  "val_examples": 38,
+  "val_refusals": 8
+}

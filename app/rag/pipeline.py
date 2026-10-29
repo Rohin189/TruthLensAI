@@ -1,6 +1,8 @@
 """Base RAG pipeline: retrieve context, generate grounded answer with citations."""
 from app.retriever.retriever import Retriever
 from app.rag.llm import generate
+from app.trust_score.trust_score import compute_trust_score
+
 
 SYSTEM_INSTRUCTION = """You are a research assistant answering questions using ONLY the provided sources.
 
@@ -31,24 +33,46 @@ def answer_question(query: str, top_k: int = 5, similarity_threshold: float = 0.
         return {
             "answer": "No relevant information found in the corpus for this question.",
             "sources": [],
+            "trust_score": 0,
+            "trust_label": "Low",
+            "trust_details": {
+                "retrieval_confidence": 0.0,
+                "citation_coverage": 0.0,
+                "is_refusal": True,
+                "sources_retrieved": 0,
+                "sources_cited": 0,
+            },
         }
 
     context = retriever.format_context(chunks)
     prompt = build_prompt(query, context)
     answer = generate(prompt)
 
+    sources_list = [
+        {
+            "title": c.title,
+            "arxiv_id": c.arxiv_id,
+            "page": c.page_number,
+            "section": c.section,
+            "similarity": c.similarity_score,
+        }
+        for c in chunks
+    ]
+
+    trust = compute_trust_score(answer, sources_list)
+
     return {
         "answer": answer,
-        "sources": [
-            {
-                "title": c.title,
-                "arxiv_id": c.arxiv_id,
-                "page": c.page_number,
-                "section": c.section,
-                "similarity": c.similarity_score,
-            }
-            for c in chunks
-        ],
+        "sources": sources_list,
+        "trust_score": trust.score,
+        "trust_label": trust.label,
+        "trust_details": {
+            "retrieval_confidence": trust.retrieval_confidence,
+            "citation_coverage": trust.citation_coverage,
+            "is_refusal": trust.is_refusal,
+            "sources_retrieved": trust.num_sources_retrieved,
+            "sources_cited": trust.num_sources_cited,
+        },
     }
     
 NO_RAG_INSTRUCTION = "Answer the following question based on your own knowledge."

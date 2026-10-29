@@ -38,3 +38,5 @@ data/embeddings/
 
 data/chroma_db/
 run.txt
+# Local Claude Code guidance
+CLAUDE.md

@@ -1,0 +1,272 @@
+{
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "versions": {
+    "transformers": "4.45.2",
+    "peft": "0.13.2",
+    "torch": "2.11.0+cu130"
+  },
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "training": {
+    "epochs": 3,
+    "lr": 0.0002,
+    "effective_batch": 8,
+    "seed": 42
+  },
+  "data": {
+    "train": 321,
+    "val": 38
+  },
+  "best_checkpoint": "qwen25-7b-truthlens-lora/checkpoint-40",
+  "best_val_loss": 0.47921085357666016,
+  "peak_vram_gb": 11.97,
+  "log_history": [
+    {
+      "loss": 1.3908,
+      "grad_norm": 1.8878813982009888,
+      "learning_rate": 0.0001666666666666667,
+      "epoch": 0.12461059190031153,
+      "step": 5
+    },
+    {
+      "loss": 0.7224,
+      "grad_norm": 0.874160647392273,
+      "learning_rate": 0.00019939306773179497,
+      "epoch": 0.24922118380062305,
+      "step": 10
+    },
+    {
+      "loss": 0.6273,
+      "grad_norm": 0.87177973985672,
+      "learning_rate": 0.00019694002659393305,
+      "epoch": 0.37383177570093457,
+      "step": 15
+    },
+    {
+      "loss": 0.6269,
+      "grad_norm": 1.181299090385437,
+      "learning_rate": 0.00019264940672148018,
+      "epoch": 0.4984423676012461,
+      "step": 20
+    },
+    {
+      "eval_loss": 0.591567873954773,
+      "eval_runtime": 64.3536,
+      "eval_samples_per_second": 0.59,
+      "eval_steps_per_second": 0.59,
+      "epoch": 0.4984423676012461,
+      "step": 20
+    },
+    {
+      "loss": 0.4697,
+      "grad_norm": 0.9331361651420593,
+      "learning_rate": 0.00018660254037844388,
+      "epoch": 0.6230529595015576,
+      "step": 25
+    },
+    {
+      "loss": 0.5855,
+      "grad_norm": 0.8373103141784668,
+      "learning_rate": 0.00017891405093963938,
+      "epoch": 0.7476635514018691,
+      "step": 30
+    },
+    {
+      "loss": 0.472,
+      "grad_norm": 0.6972397565841675,
+      "learning_rate": 0.00016972968010939954,
+      "epoch": 0.8722741433021807,
+      "step": 35
+    },
+    {
+      "loss": 0.5116,
+      "grad_norm": 0.6617951393127441,
+      "learning_rate": 0.00015922352526649803,
+      "epoch": 0.9968847352024922,
+      "step": 40
+    },
+    {
+      "eval_loss": 0.47921085357666016,
+      "eval_runtime": 63.2509,
+      "eval_samples_per_second": 0.601,
+      "eval_steps_per_second": 0.601,
+      "epoch": 0.9968847352024922,
+      "step": 40
+    },
+    {
+      "loss": 0.3553,
+      "grad_norm": 0.5640236139297485,
+      "learning_rate": 0.00014759473930370736,
+      "epoch": 1.1214953271028036,
+      "step": 45
+    },
+    {
+      "loss": 0.2641,
+      "grad_norm": 0.5475988984107971,
+      "learning_rate": 0.00013506375551927547,
+      "epoch": 1.2461059190031152,
+      "step": 50
+    },
+    {
+      "loss": 0.2339,
+      "grad_norm": 0.7554737329483032,
+      "learning_rate": 0.0001218681091206376,
+      "epoch": 1.3707165109034267,
+      "step": 55
+    },
+    {
+      "loss": 0.3429,
+      "grad_norm": 0.9786364436149597,
+      "learning_rate": 0.00010825793454723325,
+      "epoch": 1.4953271028037383,
+      "step": 60
+    },
+    {
+      "eval_loss": 0.48710736632347107,
+      "eval_runtime": 64.3676,
+      "eval_samples_per_second": 0.59,
+      "eval_steps_per_second": 0.59,
+      "epoch": 1.4953271028037383,
+      "step": 60
+    },
+    {
+      "loss": 0.3566,
+      "grad_norm": 0.9654867649078369,
+      "learning_rate": 9.449122396441345e-05,
+      "epoch": 1.6199376947040498,
+      "step": 65
+    },
+    {
+      "loss": 0.2996,
+      "grad_norm": 0.9709339737892151,
+      "learning_rate": 8.082893680762619e-05,
+      "epoch": 1.7445482866043613,
+      "step": 70
+    },
+    {
+      "loss": 0.3814,
+      "grad_norm": 1.0284768342971802,
+      "learning_rate": 6.753005307953167e-05,
+      "epoch": 1.8691588785046729,
+      "step": 75
+    },
+    {
+      "loss": 0.2972,
+      "grad_norm": 0.9271690845489502,
+      "learning_rate": 5.484666416891109e-05,
+      "epoch": 1.9937694704049844,
+      "step": 80
+    },
+    {
+      "eval_loss": 0.5175990462303162,
+      "eval_runtime": 64.0911,
+      "eval_samples_per_second": 0.593,
+      "eval_steps_per_second": 0.593,
+      "epoch": 1.9937694704049844,
+      "step": 80
+    },
+    {
+      "loss": 0.1811,
+      "grad_norm": 0.6823270320892334,
+      "learning_rate": 4.301919424897338e-05,
+      "epoch": 2.1183800623052957,
+      "step": 85
+    },
+    {
+      "loss": 0.1564,
+      "grad_norm": 1.5786631107330322,
+      "learning_rate": 3.227184283742591e-05,
+      "epoch": 2.2429906542056073,
+      "step": 90
+    },
+    {
+      "loss": 0.0948,
+      "grad_norm": 0.4477781355381012,
+      "learning_rate": 2.2808334908367914e-05,
+      "epoch": 2.367601246105919,
+      "step": 95
+    },
+    {
+      "loss": 0.1198,
+      "grad_norm": 1.1427066326141357,
+      "learning_rate": 1.4808059116167305e-05,
+      "epoch": 2.4922118380062304,
+      "step": 100
+    },
+    {
+      "eval_loss": 0.5841578245162964,
+      "eval_runtime": 64.3728,
+      "eval_samples_per_second": 0.59,
+      "eval_steps_per_second": 0.59,
+      "epoch": 2.4922118380062304,
+      "step": 100
+    },
+    {
+      "loss": 0.1173,
+      "grad_norm": 1.1868788003921509,
+      "learning_rate": 8.422667334494249e-06,
+      "epoch": 2.616822429906542,
+      "step": 105
+    },
+    {
+      "loss": 0.1576,
+      "grad_norm": 0.7995089292526245,
+      "learning_rate": 3.7731999690749585e-06,
+      "epoch": 2.7414330218068534,
+      "step": 110
+    },
+    {
+      "loss": 0.1237,
+      "grad_norm": 0.9402672052383423,
+      "learning_rate": 9.477915362496758e-07,
+      "epoch": 2.866043613707165,
+      "step": 115
+    },
+    {
+      "loss": 0.1782,
+      "grad_norm": 0.8555303812026978,
+      "learning_rate": 0.0,
+      "epoch": 2.9906542056074765,
+      "step": 120
+    },
+    {
+      "eval_loss": 0.6009006500244141,
+      "eval_runtime": 64.397,
+      "eval_samples_per_second": 0.59,
+      "eval_steps_per_second": 0.59,
+      "epoch": 2.9906542056074765,
+      "step": 120
+    },
+    {
+      "train_runtime": 5369.7676,
+      "train_samples_per_second": 0.179,
+      "train_steps_per_second": 0.022,
+      "total_flos": 4.914300893079245e+16,
+      "train_loss": 0.37776015400886537,
+      "epoch": 2.9906542056074765,
+      "step": 120
+    }
+  ],
+  "probe_generations": {
+    "What are the three categories of Vision-Language Models (VLMs) mentioned in the text?": {
+      "before": "The three categories of Vision-Language Models (VLMs) mentioned in the text are:\n\n1. **Vision-Language Understanding (VLU)**: This category encompasses models specifically designed for the interpretation and comprehension of visual information in conjunction with language.\n2. **Text Generation with Multimodal Input**: Within this classification, models that excel in generating textual content while leveraging multimodal inputs are explored, thereby incorporating diverse forms of information.\n3. **Multimodal Output with Multimodal Input**: This category focuses on models that exhibit proficiency in generating multimodal outputs using multimodal inputs, indicating their versatility in handling complex tasks involving both images and text.\n\nThese categories provide a structured way to understand the different functionalities and applications of VLMs as discussed in the sources.",
+      "after": "The three categories of Vision-Language Models (VLMs) are Vision-Language Understanding (VLU), Text Generation with Multimodal Input, and Multimodal Output with Multimodal Input (Source 2)."
+    },
+    "Which types of experiments does Are Hallucinations Bad Estimations conduct on hallucinations estimations using coin aggregation, open-ended QA, and text-to-image datasets to support its theory?": {
+      "before": "The provided sources do not contain any information about experiments conducted by \"Are Hallucinations Bad Estimations\" or details about using coin aggregation, open-ended QA, and text-to-image datasets. Therefore, based on the given information, I cannot provide an answer to this question.",
+      "after": "I cannot answer this question based on the provided sources, as they do not contain the relevant information."
+    }
+  }
+}

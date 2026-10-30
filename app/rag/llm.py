@@ -45,6 +45,29 @@ def load_model():
     return _model, _tokenizer
 
 
+def attach_lora_adapter(adapter_path: str):
+    """Wrap the loaded 4-bit model with a trained LoRA adapter (Phase 8).
+
+    After this, generate() uses the adapter; wrap calls in
+    `with get_model().disable_adapter():` to get base-model output from the same weights.
+    """
+    global _model
+    from peft import PeftModel  # only needed for fine-tuned inference
+
+    model, _ = load_model()
+    if not isinstance(model, PeftModel):
+        print(f"Attaching LoRA adapter from {adapter_path}...")
+        _model = PeftModel.from_pretrained(model, adapter_path)
+        _model.eval()
+        print_vram("After adapter load")
+    return _model
+
+
+def get_model():
+    model, _ = load_model()
+    return model
+
+
 def generate(prompt: str, max_new_tokens: int = 512, temperature: float = 0.3) -> str:
     model, tokenizer = load_model()
 

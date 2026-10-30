@@ -17,6 +17,7 @@ faiss-cpu==1.9.0.post1
 # LLM inference (local, quantized) - swap for provider SDK if using hosted API
 transformers==4.45.2
 accelerate==0.34.2
+peft==0.13.2  # LoRA adapter loading (Phase 8); must match the Colab training version
 # torch installed SEPARATELY below via PyTorch's own index - do not pip install from this file
 
 # Backend / frontend

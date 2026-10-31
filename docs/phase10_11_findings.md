@@ -49,9 +49,9 @@ Triggered only when at least one claim is flagged unsupported or contradicted. T
 - **regenerate:** same sources; the prompt lists the flagged statements and asks for an answer that drops or corrects them. The new answer is re-verified from scratch.
 - **prune:** delete the sentences that produced flagged claims; the surviving claims keep their verdicts. If nothing survives, the answer becomes a refusal.
 
-**Selection:** an answer candidate is eligible only if at least half its claim credit is verified (`MIN_SUPPORT_TO_ANSWER = 0.5`); the highest-scoring eligible candidate wins (ties → least edited). If none is eligible, a refusal is returned.
+**Selection:** an answer candidate is eligible only if at least half its claim credit is verified (`MIN_SUPPORT_TO_ANSWER = 0.5`) and no claim is contradicted; the highest-scoring eligible candidate wins (ties → least edited). If none is eligible, a refusal is returned.
 
-The first version simply took the highest trust score. Reviewing its output showed the flaw: a refusal scores `100 × (1 − relevance)`, which is low when relevant sources were retrieved, so a confirmed-wrong answer (q10: 24/100) beat an honest refusal (5/100). The eligibility rule fixes this. **It was chosen after seeing these 7 items and has not been validated on held-out data.**
+The first version simply took the highest trust score. Reviewing its output showed the flaw: a refusal scores `100 × (1 − relevance)`, which is low when relevant sources were retrieved, so a confirmed-wrong answer (q10: 24/100) beat an honest refusal (5/100). The eligibility rule fixes this. The no-contradiction condition was added after a live false-premise question ("Why does LoRA *increase* the number of trainable parameters...?") kept an answer whose cited source said the opposite (2/3 claims supported, 39/100); it changes none of the 7 results below. **It was chosen after seeing these 7 items and has not been validated on held-out data.**
 
 Re-retrieval (querying again with the flagged claims) was not implemented: retrieval for the same question is deterministic, and the flagged facts were usually absent from the sources rather than mis-retrieved.
 

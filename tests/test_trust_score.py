@@ -58,3 +58,13 @@ def test_select_prefers_refusal_over_mostly_unverified_answer():
     assert select(cands).strategy == "prune"
     cands = [Candidate("original", "abc", ok, score(ok, sims)), Candidate("prune", "r", refusal, score(refusal, sims))]
     assert select(cands).strategy == "original"
+
+
+def test_select_never_keeps_contradicted_answer():
+    from app.self_correction.corrector import Candidate, score, select
+    sims = [0.75]
+    contra = AnswerVerification(False, [verdict("A.", "supported", 0), verdict("B.", "supported", 1),
+                                        verdict("C.", "contradicted", 2)])
+    refusal = AnswerVerification(True)
+    cands = [Candidate("original", "abc", contra, score(contra, sims)), Candidate("prune", "r", refusal, score(refusal, sims))]
+    assert select(cands).strategy == "prune"

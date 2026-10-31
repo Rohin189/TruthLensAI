@@ -5,10 +5,11 @@
              -> claim-based trust score
              -> if any claim is flagged: self-correct and keep the best candidate
 """
+from contextlib import nullcontext
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from app.rag.llm import attach_lora_adapter, generate
+from app.rag.llm import attach_lora_adapter, generate, get_model
 from app.rag.pipeline import build_prompt
 from app.retriever.retriever import Retriever
 from app.self_correction.corrector import Candidate, correct, score
@@ -60,7 +61,11 @@ def run_truthlens(question: str, adapter_path: str | None = DEFAULT_ADAPTER, sel
     prompt = build_prompt(question, retriever.format_context(chunks))
 
     def generate_fn(p: str) -> str:
-        return generate(p, max_new_tokens=MAX_NEW_TOKENS, temperature=0)
+        # an adapter attached earlier in this process stays on the model; switch it off for base generation
+        model = get_model()
+        ctx = nullcontext() if adapter_used or not hasattr(model, "disable_adapter") else model.disable_adapter()
+        with ctx:
+            return generate(p, max_new_tokens=MAX_NEW_TOKENS, temperature=0)
 
     answer = generate_fn(prompt)
     verification = verify_answer(answer, question, texts)

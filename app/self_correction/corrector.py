@@ -3,7 +3,7 @@
 Triggered only when the verifier flags at least one claim as unsupported or contradicted.
 Two candidate repairs are built and every candidate (original included) is scored with the
 claim-based trust score. An answer is eligible only if at least half of its claim credit is
-verified (MIN_SUPPORT_TO_ANSWER); the highest-scoring eligible answer wins, ties going to the
+verified (MIN_SUPPORT_TO_ANSWER) and none is contradicted; the highest-scoring eligible answer wins, ties going to the
 least-edited candidate. If no answer is eligible, a refusal is returned instead: declining is
 better than a mostly unverified answer, even though a refusal's own score is low when the
 sources looked relevant.
@@ -101,7 +101,9 @@ def correct(question: str, prompt: str, sources: list[str], similarities: list[f
 
 def select(candidates: list[Candidate]) -> Candidate:
     edit_rank = {"original": 0, "prune": 1, "regenerate": 2}
-    eligible = [c for c in candidates if not c.trust.is_refusal and c.trust.support >= MIN_SUPPORT_TO_ANSWER]
+    # a contradicted claim means the source says the opposite: never show it if a refusal is available
+    eligible = [c for c in candidates if not c.trust.is_refusal and c.trust.support >= MIN_SUPPORT_TO_ANSWER
+                and c.verification.count(CONTRADICTED) == 0]
     refusals = [c for c in candidates if c.trust.is_refusal]
     pool = eligible or refusals or candidates
     return max(pool, key=lambda c: (c.trust.score, -edit_rank[c.strategy]))

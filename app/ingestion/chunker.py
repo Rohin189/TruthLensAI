@@ -4,6 +4,11 @@ CHUNK_SIZE = 800
 CHUNK_OVERLAP = 150
 
 
+def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[str]:
+    """Split text into overlapping chunks, preferring to break at sentence ends."""
+    return [chunk for chunk, _ in chunk_text_with_offsets(text, chunk_size, overlap)]
+
+
 def chunk_text_with_offsets(
     text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP
 ) -> list[tuple[str, int]]:

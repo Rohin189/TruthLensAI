@@ -1,0 +1,73 @@
+"""Full TruthLens pipeline (Stages 3-5): LoRA RAG -> claim verification -> trust score -> self-correction.
+
+    retrieve -> build_prompt -> generate (LoRA adapter if present, greedy)
+             -> extract + verify claims (Qwen judge on base weights)
+             -> claim-based trust score
+             -> if any claim is flagged: self-correct and keep the best candidate
+"""
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from app.rag.llm import attach_lora_adapter, generate
+from app.rag.pipeline import build_prompt
+from app.retriever.retriever import Retriever
+from app.self_correction.corrector import Candidate, correct, score
+from app.verification.verifier import AnswerVerification, verify_answer
+
+DEFAULT_ADAPTER = "models/lora_adapters/qwen25-7b-truthlens-lora"
+TOP_K = 5
+SIMILARITY_THRESHOLD = 0.3
+MAX_NEW_TOKENS = 512
+NO_SOURCES_ANSWER = "No relevant information found in the corpus for this question."
+
+
+@dataclass
+class TruthLensResult:
+    question: str
+    answer: str
+    sources: list[dict]               # metadata + text + similarity, in prompt order
+    best: Candidate
+    candidates: list[Candidate] = field(default_factory=list)  # original first
+    adapter_used: bool = False
+
+    @property
+    def corrected(self) -> bool:
+        return self.best.strategy != "original"
+
+
+def load_generator(adapter_path: str | None = DEFAULT_ADAPTER) -> bool:
+    """Attach the LoRA adapter if it exists locally. Returns whether it is in use."""
+    if adapter_path and (Path(adapter_path) / "adapter_config.json").exists():
+        attach_lora_adapter(adapter_path)
+        return True
+    return False
+
+
+def run_truthlens(question: str, adapter_path: str | None = DEFAULT_ADAPTER, self_correct: bool = True) -> TruthLensResult:
+    adapter_used = load_generator(adapter_path)
+    retriever = Retriever(similarity_threshold=SIMILARITY_THRESHOLD)
+    chunks = retriever.retrieve(question, top_k=TOP_K)
+    sources = [{"title": c.title, "arxiv_id": c.arxiv_id, "page": c.page_number, "section": c.section,
+                "similarity": c.similarity_score, "text": c.text} for c in chunks]
+    similarities = [s["similarity"] for s in sources]
+
+    if not chunks:
+        v = AnswerVerification(is_refusal=True)
+        best = Candidate("original", NO_SOURCES_ANSWER, v, score(v, similarities))
+        return TruthLensResult(question, NO_SOURCES_ANSWER, sources, best, [best], adapter_used)
+
+    texts = [c.text for c in chunks]
+    prompt = build_prompt(question, retriever.format_context(chunks))
+
+    def generate_fn(p: str) -> str:
+        return generate(p, max_new_tokens=MAX_NEW_TOKENS, temperature=0)
+
+    answer = generate_fn(prompt)
+    verification = verify_answer(answer, question, texts)
+    if self_correct:
+        result = correct(question, prompt, texts, similarities, answer, verification, generate_fn)
+        best, candidates = result.best, result.candidates
+    else:
+        best = Candidate("original", answer, verification, score(verification, similarities))
+        candidates = [best]
+    return TruthLensResult(question, best.answer, sources, best, candidates, adapter_used)

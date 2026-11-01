@@ -78,6 +78,8 @@ About 10 minutes. Every output below was produced by the live pipeline on 2026-1
 
 **You will see:** declined, **Trust Score: 93/100 High**, retrieval relevance 0.07.
 
+The passages are folded away under "Closest passages found; none judged relevant". (In Demo 4 the same section reads "Passages retrieved; no verifiable answer could be built from them", because those passages *were* on-topic.)
+
 **Say:** "Nothing relevant was retrieved, so declining is fully justified. The no-RAG baseline (Stage 1) answered this from memory, and on 'How many parameters does GPT-5 have?' it even called GPT-4 an Anthropic model."
 
 ### Finish: the Results page

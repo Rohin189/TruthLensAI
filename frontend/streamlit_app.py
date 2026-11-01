@@ -130,11 +130,27 @@ def page_ask():
                              expanded=c.strategy == "original"):
                 st.write(c.answer)
 
-    st.subheader("Sources")
-    for i, s in enumerate(result.sources, 1):
-        with st.expander(f"[{i}] {s['title']} (arXiv:{s['arxiv_id']}), p. {s['page']} - similarity {s['similarity']:.3f}"):
-            st.caption(f"Section: {s['section']}")
-            st.write(s["text"])
+    if not result.sources:
+        return
+    if t.is_refusal:
+        # the answer used none of these, so keep them out of the way; wording depends on whether they were on-topic
+        heading = ("Closest passages found; none judged relevant" if t.retrieval_relevance <= 0.5
+                   else "Passages retrieved; no verifiable answer could be built from them")
+        container = st.expander(heading, expanded=False)
+    else:
+        st.subheader("Sources")
+        container = st.container()
+    with container:
+        for i, s in enumerate(result.sources, 1):
+            label = f"[{i}] {s['title']} (arXiv:{s['arxiv_id']}), p. {s['page']} - similarity {s['similarity']:.3f}"
+            if t.is_refusal:
+                st.markdown(f"**{label}**")
+                st.caption(f"Section: {s['section']}")
+                st.write(s["text"])
+            else:
+                with st.expander(label):
+                    st.caption(f"Section: {s['section']}")
+                    st.write(s["text"])
 
 
 def read_jsonl(path: Path) -> list[dict]:

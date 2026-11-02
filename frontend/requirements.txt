@@ -1,0 +1,3 @@
+# Streamlit Community Cloud (replay mode, no GPU). Cloud reads this file because it sits next to the
+# entrypoint (frontend/streamlit_app.py); the root requirements.txt is for the full local GPU pipeline.
+streamlit==1.39.0

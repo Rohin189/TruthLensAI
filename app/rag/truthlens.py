@@ -6,7 +6,7 @@
              -> if any claim is flagged: self-correct and keep the best candidate
 """
 from contextlib import nullcontext
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from app.rag.llm import attach_lora_adapter, generate, get_model
@@ -76,3 +76,31 @@ def run_truthlens(question: str, adapter_path: str | None = DEFAULT_ADAPTER, sel
         best = Candidate("original", answer, verification, score(verification, similarities))
         candidates = [best]
     return TruthLensResult(question, best.answer, sources, best, candidates, adapter_used)
+
+
+VERDICT_SEVERITY = ["supported", "uncited_supported", "misattributed", "unsupported", "contradicted"]
+
+
+def candidate_to_dict(c: Candidate) -> dict:
+    """Plain-JSON view of a candidate. Sentences carry their worst verdict, so a viewer can highlight the
+    answer without importing the extractor (which loads torch)."""
+    from app.verification.claim_extractor import split_sentences
+    worst: dict[int, str] = {}
+    for cv in c.verification.claims:
+        if cv.sentence_index not in worst or (VERDICT_SEVERITY.index(cv.verdict)
+                                              > VERDICT_SEVERITY.index(worst[cv.sentence_index])):
+            worst[cv.sentence_index] = cv.verdict
+    return {
+        "strategy": c.strategy,
+        "answer": c.answer,
+        "trust": asdict(c.trust),
+        "claims": [{"claim": cv.claim, "cited_sources": cv.cited_sources, "verdict": cv.verdict,
+                    "judge_reason": cv.judge_reason, "sentence_index": cv.sentence_index}
+                   for cv in c.verification.claims],
+        "sentences": [{"text": s, "verdict": worst.get(i)} for i, s in enumerate(split_sentences(c.answer))],
+    }
+
+
+def result_to_dict(r: TruthLensResult) -> dict:
+    return {"question": r.question, "answer": r.answer, "sources": r.sources, "adapter_used": r.adapter_used,
+            "best": candidate_to_dict(r.best), "candidates": [candidate_to_dict(c) for c in r.candidates]}

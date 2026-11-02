@@ -70,6 +70,17 @@ python scripts\chat_cli.py                # same pipeline in the terminal
 
 The LoRA adapter weights are not in the repository (only their config and training curve). Without them the pipeline falls back to base Qwen as the generator.
 
+### Hosted demo (replay mode)
+
+The live pipeline needs a CUDA GPU with about 6 GB of VRAM, so the hosted demo on Streamlit Community Cloud runs in **replay mode**. When the app finds no CUDA GPU (or `TRUTHLENS_REPLAY=1` is set), the Ask page shows full-pipeline runs recorded locally: 7 demo questions × 4 sidebar settings (LoRA on/off × self-correction on/off), stored in `data/demo/recorded_runs.json`. The Results page is the same as the local app. In replay mode the app imports only `streamlit` (`frontend/requirements.txt`).
+
+```powershell
+python scripts\record_demo.py             # re-record on the local GPU (resumable; --fresh to start over)
+$env:TRUTHLENS_REPLAY = "1"; streamlit run frontend\streamlit_app.py   # preview replay mode locally
+```
+
+To deploy: on [share.streamlit.io](https://share.streamlit.io), create an app from this repository (branch `main`) with main file path `frontend/streamlit_app.py`, and set Python 3.12 under Advanced settings.
+
 ### Reproducing the evaluation
 
 ```powershell
@@ -96,7 +107,8 @@ app/
   trust_score/      interim and claim-based trust scores
   self_correction/  regenerate / prune / refuse
   evaluation/       stage comparison harnesses
-frontend/           Streamlit demo
+frontend/           Streamlit demo (live on a GPU, replay mode without one)
+data/demo/          recorded pipeline runs for replay mode
 notebooks/          Colab QLoRA training notebook
 scripts/            CLI entry points
 data/eval/          questions, answers, claims, verdicts, gold labels, scores

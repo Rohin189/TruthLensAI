@@ -22,6 +22,8 @@ sys.path.append(str(ROOT))
 
 import streamlit as st
 
+from app.trust_score.trust_score import REFUSAL_REASONS, score_display  # pure Python, safe in replay mode
+
 st.set_page_config(page_title="TruthLens AI", layout="wide")
 
 VERDICT_STYLE = {  # label, colour (translucent so it reads in light and dark themes)
@@ -78,11 +80,11 @@ def annotated_answer(sentences: list[dict]) -> str:
 
 
 def trust_badge(trust: dict) -> str:
-    colour = LABEL_COLOUR[trust["label"]]
+    colour = LABEL_COLOUR[trust["label"]]  # refusal labels share the same 70 / 40 cut-offs
+    heading, label = score_display(trust["score"], trust["label"], trust["is_refusal"])
     return (f'<div style="border-left:6px solid {colour};padding:8px 14px;border-radius:4px;'
             f'background:rgba(127,127,127,0.08)"><span style="font-size:1.6em;font-weight:700">'
-            f'Trust Score: {trust["score"]}/100</span> <span style="color:{colour};font-weight:600">'
-            f'{trust["label"]}</span></div>')
+            f'{heading}</span> <span style="color:{colour};font-weight:600">{label}</span></div>')
 
 
 def page_ask():
@@ -137,8 +139,11 @@ def render_result(run: dict, use_adapter: bool):
 
     st.markdown(trust_badge(t), unsafe_allow_html=True)
     if t["is_refusal"]:
-        st.caption(f"The system declined to answer. Retrieval relevance {t['retrieval_relevance']:.2f}: "
-                   "a refusal scores higher when the retrieved sources are weak.")
+        _, label = score_display(t["score"], t["label"], True)
+        st.markdown(f"**Why did TruthLens decline?** {REFUSAL_REASONS[label]}")
+        st.caption(f"Retrieval relevance {t['retrieval_relevance']:.2f}. The Refusal Score rates the decision to "
+                   "decline (higher when the retrieved sources are weak); it is not a confidence that any answer "
+                   "is correct, and it does not prove off-topic questions are always detected.")
     else:
         st.caption(f"{t['num_supported']}/{t['num_claims']} claims supported by their cited source - "
                    f"support {t['support']:.2f}, citation precision {t['citation_precision']:.2f}, "
@@ -167,7 +172,8 @@ def render_result(run: dict, use_adapter: bool):
         st.write(f"The first answer had flagged claims, so {len(candidates) - 1} repairs were tried. "
                  f"Kept: **{best['strategy']}**.")
         for c in candidates:
-            with st.expander(f"{c['strategy']} - Trust Score: {c['trust']['score']}/100 ({c['trust']['label']})",
+            heading, label = score_display(c["trust"]["score"], c["trust"]["label"], c["trust"]["is_refusal"])
+            with st.expander(f"{c['strategy']} - {heading} ({label})",
                              expanded=c["strategy"] == "original"):
                 st.write(c["answer"])
 

@@ -66,17 +66,19 @@ About 10 minutes. Every output below was produced by the live pipeline on 2026-1
 
 **Ask:** `What are the main challenges of deploying RAG in industry?`
 
-**You will see:** declined. Under **Self-correction**, the original (24/100) said "data preprocessing, integration into existing workflows, and data privacy (Source 3)", but Source 3 does not say that.
+**You will see:** declined, **Refusal Score: 5/100, Questionable refusal**, with "Why did TruthLens decline? Relevant passages were retrieved, but no answer could be verified against them...". Under **Self-correction**, the original (24/100) said "data preprocessing, integration into existing workflows, and data privacy (Source 3)", but Source 3 does not say that.
 
 **Say:** "The citation looks legitimate, but the cited passage doesn't contain those challenges. The system prefers saying 'I can't verify this' to inventing an answer."
 
-**If asked why the score is 5/100 on a refusal:** for refusals the score measures *how justified declining is*. Here the sources were highly relevant (relevance 0.95), so a refusal is suspicious: it means "relevant papers exist, but no verifiable answer could be produced; a human should look". Compare with Demo 5.
+**If asked why the Refusal Score is 5/100:** for refusals the number rates *how justified declining is*, which is why the page calls it a Refusal Score rather than a Trust Score. Here the sources were highly relevant (relevance 0.95), so a refusal is suspicious: it means "relevant papers exist, but no verifiable answer could be produced; a human should look". Compare with Demo 5.
 
 ### Demo 5: a question outside the corpus
 
 **Ask:** `What is quantum entanglement?`
 
-**You will see:** declined, **Trust Score: 93/100 High**, retrieval relevance 0.07.
+**You will see:** declined, **Refusal Score: 93/100, Justified refusal**, retrieval relevance 0.07, and "Why did TruthLens decline? The retrieved papers did not contain relevant information...".
+
+**Say:** "For answers the page shows a Trust Score: how well each claim is backed by evidence. For refusals it shows a Refusal Score: how justified it was to decline. They are two different measurements. A high Refusal Score means declining was right, not that anything was proven correct."
 
 The passages are folded away under "Closest passages found; none judged relevant". (In Demo 4 the same section reads "Passages retrieved; no verifiable answer could be built from them", because those passages *were* on-topic.)
 

@@ -20,7 +20,7 @@ The interim score (`compute_trust_score`) blended mean retrieval similarity (65%
 - **Caps:** any unsupported claim caps the score at 69 (an unverifiable claim rules out "High"); any contradicted claim caps it at 39 ("Low").
 - **Refusals** (refusal phrase *and* no citations, `is_refusal_answer`) score how justified declining is: `100 × (1 − relevance)`. Declining when the sources are off-topic scores high; declining when strong sources were retrieved scores low.
 - **Relevance scaling** comes from measured similarities on the 50 eval items: off-topic questions ("What is football?") top out at 0.45-0.52 because bge similarities are compressed, while answerable questions reach 0.67-0.87. The interim score used the raw mean, so even "What is football?" received 0.44 × 65 ≈ 29 points from retrieval.
-- Reported as **"Trust Score: N/100 (Label) - k/n claims supported by their cited source"**. The weights are design choices, not fitted; calibration is untested (Phase 12).
+- Reported as **"Trust Score: N/100 (Label) - k/n claims supported by their cited source"**. Refusals are displayed separately as **"Refusal Score: N/100"** with Justified (≥ 70) / Uncertain (≥ 40) / Questionable refusal labels, because that number rates the decision to decline, not an answer (display change of 2026-11-04; the numbers are unchanged). The weights are design choices, not fitted; calibration is untested (Phase 12).
 
 ### Evaluation: does the score separate good answers from bad ones?
 

@@ -97,6 +97,29 @@ W_SUPPORT, W_CITATION, W_RELEVANCE = 0.60, 0.15, 0.25
 CAP_UNSUPPORTED = 69   # an unverifiable claim rules out "High"
 CAP_CONTRADICTED = 39  # a contradicted claim means "Low"
 
+# A refusal's number rates the decision to decline (high when nothing relevant was retrieved),
+# not the correctness of an answer, so it is shown as a "Refusal Score" with its own labels.
+REFUSAL_LABELS = ((70, "Justified refusal"), (40, "Uncertain refusal"), (0, "Questionable refusal"))
+REFUSAL_REASONS = {
+    "Justified refusal": "The retrieved papers did not contain relevant information, so the question appears "
+                         "to be outside the corpus. Declining was the right decision.",
+    "Uncertain refusal": "The closest passages were only partly related. Declining is plausible, "
+                         "but the answer might exist in the corpus.",
+    "Questionable refusal": "Relevant passages were retrieved, but no answer could be verified against them. "
+                            "The answer may exist in the corpus; a human should check.",
+}
+
+
+def refusal_label(score: int) -> str:
+    return next(label for floor, label in REFUSAL_LABELS if score >= floor)
+
+
+def score_display(score: int, label: str, is_refusal: bool) -> tuple[str, str]:
+    """(heading, label) for display: 'Trust Score' for answers, 'Refusal Score' for refusals."""
+    if is_refusal:
+        return f"Refusal Score: {score}/100", refusal_label(score)
+    return f"Trust Score: {score}/100", label
+
 
 @dataclass
 class ClaimTrustResult:
@@ -113,7 +136,8 @@ class ClaimTrustResult:
 
     def summary_line(self) -> str:
         if self.is_refusal:
-            return f"Trust Score: {self.score}/100 ({self.label}) - refusal; retrieval relevance {self.retrieval_relevance:.2f}"
+            return (f"Refusal Score: {self.score}/100 ({refusal_label(self.score)}) - "
+                    f"retrieval relevance {self.retrieval_relevance:.2f}")
         return (f"Trust Score: {self.score}/100 ({self.label}) - "
                 f"{self.num_supported}/{self.num_claims} claims supported by their cited source")
 

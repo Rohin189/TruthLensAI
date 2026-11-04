@@ -49,7 +49,7 @@ Reported as **"Trust Score: N/100 (High / Moderate / Low)"** with supporting cou
 | Citation precision (cited claims whose source supports them) | 15% |
 | Retrieval relevance (best source similarity, rescaled 0.50 → 0.80) | 25% |
 
-Any unsupported claim caps the score at 69 (never High); a contradicted claim caps it at 39. For a refusal, the score reflects how justified declining is (high when retrieval found nothing relevant).
+Any unsupported claim caps the score at 69 (never High); a contradicted claim caps it at 39. Refusals are scored on a separate path and shown as **"Refusal Score: N/100"** (Justified ≥ 70 / Uncertain ≥ 40 / Questionable refusal): it rates how justified declining was, high when retrieval found nothing relevant and low when relevant sources were ignored. It is not a confidence that any answer is correct.
 
 ## Quick start (Windows / PowerShell)
 

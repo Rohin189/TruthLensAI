@@ -68,3 +68,14 @@ def test_select_never_keeps_contradicted_answer():
     refusal = AnswerVerification(True)
     cands = [Candidate("original", "abc", contra, score(contra, sims)), Candidate("prune", "r", refusal, score(refusal, sims))]
     assert select(cands).strategy == "prune"
+
+
+def test_refusal_shown_as_refusal_score_with_its_own_label():
+    from app.trust_score.trust_score import score_display
+    off_topic = compute_claim_trust_score([], [], [0.45], True)
+    assert score_display(off_topic.score, off_topic.label, True) == ("Refusal Score: 100/100", "Justified refusal")
+    assert off_topic.summary_line().startswith("Refusal Score: 100/100 (Justified refusal)")
+    strong = compute_claim_trust_score([], [], [0.85], True)
+    assert score_display(strong.score, strong.label, True)[1] == "Questionable refusal"
+    answer = compute_claim_trust_score(["supported"], [True], [0.82], False)
+    assert score_display(answer.score, answer.label, False) == ("Trust Score: 100/100", "High")
